@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "163589539077",
+    "project_id": "agenda-d2461",
+    "storage_bucket": "agenda-d2461.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:163589539077:android:0069eda7e6945f8bc2e36c",
+        "android_client_info": {
+          "package_name": "com.example.taskiapp"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA4PdX1LHwvfeKd5Z6VlVI_Aikl36BR8io"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
