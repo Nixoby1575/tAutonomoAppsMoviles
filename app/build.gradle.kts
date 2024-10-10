@@ -55,7 +55,8 @@ dependencies {
     implementation(libs.androidx.activity.compose)
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.material3)
-    implementation(libs.firebase.auth.ktx) // Firebase Authentication
+    implementation(libs.firebase.auth.ktx)
+    implementation(libs.firebase.firestore.ktx) // Firebase Authentication
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

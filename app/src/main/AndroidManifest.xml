@@ -35,6 +35,24 @@
             android:name=".Registro"
             android:exported="true"
             android:label="@string/app_name" />
+
+        <!-- Bienvenido Activity -->
+        <activity
+            android:name=".BienvenidoActivity"
+            android:exported="true"
+            android:label="@string/app_name" />
+
+        <!-- Nota Activity -->
+        <activity
+            android:name=".NotaActivity"
+            android:exported="true"
+            android:label="Agregar Nota" />
+
+        <!-- Mis Notas Activity -->
+        <activity
+            android:name=".MisNotasActivity"
+            android:exported="true"
+            android:label="Mis Notas" />
     </application>
 
     <uses-permission android:name="android.permission.INTERNET" />

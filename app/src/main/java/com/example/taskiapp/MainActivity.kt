@@ -4,11 +4,9 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.Button
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -20,50 +18,57 @@ import com.example.taskiapp.ui.theme.TASKIAPPTheme
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
-        setContent {
-            TASKIAPPTheme {
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
+
+        val sharedPref = getSharedPreferences("MyAppPreferences", MODE_PRIVATE)
+        val isLoggedIn = sharedPref.getBoolean("isLoggedIn", false)
+
+        if (isLoggedIn) {
+            // Si el usuario ya ha iniciado sesión, redirigir a BienvenidoActivity
+            val intent = Intent(this, BienvenidoActivity::class.java)
+            startActivity(intent)
+            finish() // Cierra la actividad actual para que no pueda regresar al login
+        } else {
+            // Si no ha iniciado sesión, mostrar la pantalla de inicio
+            setContent {
+                TASKIAPPTheme {
                     SplashScreen(
-                        modifier = Modifier.padding(innerPadding),
+                        modifier = Modifier.fillMaxSize(),
                         activity = this
                     )
                 }
             }
         }
     }
-}
 
-@Composable
-fun SplashScreen(modifier: Modifier = Modifier, activity: ComponentActivity) {
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Image(
-            painter = painterResource(id = R.drawable.logo_notas), // Reemplaza con tu logo
-            contentDescription = "Logo de la app",
-            modifier = Modifier.size(150.dp)
-        )
-        Spacer(modifier = Modifier.height(24.dp))
+    @Composable
+    fun SplashScreen(modifier: Modifier = Modifier, activity: ComponentActivity) {
+        Column(
+            modifier = modifier.padding(16.dp),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Image(
+                painter = painterResource(id = R.drawable.logo_notas), // Reemplaza con tu logo
+                contentDescription = "Logo de la app",
+                modifier = Modifier.size(150.dp)
+            )
+            Spacer(modifier = Modifier.height(24.dp))
 
-        Button(onClick = {
-            val intent = Intent(activity, Login::class.java)
-            activity.startActivity(intent)
-        }) {
-            Text(text = "Login")
-        }
+            Button(onClick = {
+                val intent = Intent(activity, Login::class.java)
+                activity.startActivity(intent)
+            }) {
+                Text(text = "Login")
+            }
 
-        Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(16.dp))
 
-        Button(onClick = {
-            val intent = Intent(activity, Registro::class.java)
-            activity.startActivity(intent)
-        }) {
-            Text(text = "Registro")
+            Button(onClick = {
+                val intent = Intent(activity, Registro::class.java)
+                activity.startActivity(intent)
+            }) {
+                Text(text = "Registro")
+            }
         }
     }
 }

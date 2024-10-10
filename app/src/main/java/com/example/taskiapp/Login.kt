@@ -1,6 +1,6 @@
 package com.example.taskiapp
-
-
+import android.content.Context // Agrega esta línea
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -11,11 +11,13 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
-import com.google.firebase.auth.FirebaseAuth
-import android.widget.Toast
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.unit.dp
+import android.widget.Toast
 import com.example.taskiapp.ui.theme.TASKIAPPTheme
+import com.google.firebase.auth.FirebaseAuth
+
+import android.content.SharedPreferences
 
 class Login : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -33,6 +35,7 @@ fun LoginScreen() {
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     val context = LocalContext.current // Obtener el contexto
+    val sharedPref = context.getSharedPreferences("MyAppPreferences", Context.MODE_PRIVATE) // Obtener SharedPreferences
 
     Column(
         modifier = Modifier
@@ -66,8 +69,24 @@ fun LoginScreen() {
             auth.signInWithEmailAndPassword(email, password)
                 .addOnCompleteListener { task ->
                     if (task.isSuccessful) {
+                        // Obtener el nombre del usuario
+                        val user = auth.currentUser
+                        val userName = user?.displayName ?: "Usuario"
+
+                        // Guardar el estado de inicio de sesión y el nombre de usuario
+                        with(sharedPref.edit()) {
+                            putBoolean("isLoggedIn", true)
+                            putString("userName", userName) // Guardar el nombre de usuario
+                            apply()
+                        }
+
+                        // Mostrar mensaje de éxito
                         Toast.makeText(context, "Inicio de sesión exitoso", Toast.LENGTH_SHORT).show()
-                        // Navegar a otra pantalla o hacer algo más
+
+                        // Navegar a la actividad de bienvenida
+                        val intent = Intent(context, BienvenidoActivity::class.java)
+                        intent.putExtra("userName", userName)
+                        context.startActivity(intent)
                     } else {
                         Toast.makeText(context, "Error en el inicio de sesión", Toast.LENGTH_SHORT).show()
                     }
