@@ -53,6 +53,25 @@
             android:name=".MisNotasActivity"
             android:exported="true"
             android:label="Mis Notas" />
+
+        <!-- Agregar Categoría Activity -->
+        <activity
+            android:name=".AgregarCategoriaActivity"
+            android:exported="true"
+            android:label="Agregar Categoría" />
+
+        <!-- Categorías Activity -->
+        <activity
+            android:name=".CategoriasActivity"
+            android:exported="true"
+            android:label="Categorías" />
+
+        <!-- Nueva Notas por Categoria Activity -->
+        <activity
+            android:name=".NotasPorCategoriaActivity"
+            android:exported="true"
+            android:label="Notas por Categoría" />
+
     </application>
 
     <uses-permission android:name="android.permission.INTERNET" />

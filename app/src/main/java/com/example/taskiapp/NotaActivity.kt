@@ -5,44 +5,89 @@ import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.material3.Button
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Text
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import androidx.compose.ui.platform.LocalContext
 import java.util.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.Icon
 
 class NotaActivity : ComponentActivity() {
+    private lateinit var categoriaId: String // Declara categoriaId como lateinit
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        categoriaId = intent.getStringExtra("categoriaId") ?: "" // Obtiene categoriaId del intent
         setContent {
-            NotaScreen()
+            NotaScreen(onBackClick = { finish() }, categoriaId = categoriaId) // Pasa categoriaId aquí
         }
     }
 }
 
 @Composable
-fun NotaScreen() {
+fun NotaScreen(onBackClick: () -> Unit, categoriaId: String) {
     var titulo by remember { mutableStateOf("") }
     var descripcion by remember { mutableStateOf("") }
-    var fecha by remember { mutableStateOf("Selecciona una fecha") }
+    var fecha by remember { mutableStateOf("") }
+    var loading by remember { mutableStateOf(false) }
+    val context = LocalContext.current
+
+    // Obteniendo Firestore y el usuario actual
     val firestore = FirebaseFirestore.getInstance()
     val auth = FirebaseAuth.getInstance()
-    val context = LocalContext.current
+    val userId = auth.currentUser?.uid // Obtener el ID del usuario actual
 
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(16.dp),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally
+            .background(MaterialTheme.colorScheme.background)
+            .padding(16.dp)
     ) {
+        // Encabezado
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(MaterialTheme.colorScheme.primary) // Color del encabezado
+                .padding(16.dp)
+        ) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.Start
+            ) {
+                // Botón de regresar
+                IconButton(onClick = onBackClick) {
+                    Icon(
+                        imageVector = Icons.Default.ArrowBack,
+                        contentDescription = "Regresar",
+                        tint = Color.White
+                    )
+                }
+
+                Spacer(modifier = Modifier.width(16.dp))
+
+                // Texto de "Agregar tu nota"
+                Text(
+                    text = "Agregar tu nota",
+                    color = Color.White,
+                    style = MaterialTheme.typography.headlineSmall
+                )
+            }
+        }
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        // Campos de entrada para la nota
         OutlinedTextField(
             value = titulo,
             onValueChange = { titulo = it },
@@ -50,7 +95,7 @@ fun NotaScreen() {
             modifier = Modifier.fillMaxWidth()
         )
 
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(8.dp))
 
         OutlinedTextField(
             value = descripcion,
@@ -59,66 +104,58 @@ fun NotaScreen() {
             modifier = Modifier.fillMaxWidth()
         )
 
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(8.dp))
 
-        Button(onClick = {
+        // Botón para seleccionar la fecha
+        OutlinedButton(onClick = {
             val calendar = Calendar.getInstance()
-            val year = calendar.get(Calendar.YEAR)
-            val month = calendar.get(Calendar.MONTH)
-            val day = calendar.get(Calendar.DAY_OF_MONTH)
-
-            // Crear un DatePickerDialog
             val datePickerDialog = DatePickerDialog(
                 context,
-                { _, selectedYear, selectedMonth, selectedDay ->
-                    // Actualizar la fecha seleccionada
-                    fecha = "$selectedDay/${selectedMonth + 1}/$selectedYear"
+                { _, year, month, dayOfMonth ->
+                    fecha = "$dayOfMonth/${month + 1}/$year" // Formato de fecha
                 },
-                year,
-                month,
-                day
+                calendar.get(Calendar.YEAR),
+                calendar.get(Calendar.MONTH),
+                calendar.get(Calendar.DAY_OF_MONTH)
             )
             datePickerDialog.show()
         }) {
-            Text(text = "Seleccionar Fecha")
+            Text(text = if (fecha.isEmpty()) "Selecciona una fecha" else "Fecha: $fecha")
         }
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        Text(text = "Fecha seleccionada: $fecha")
-
-        Spacer(modifier = Modifier.height(24.dp))
-
-        Button(onClick = {
-            // Validar que el título y la descripción no estén vacíos
-            if (titulo.isEmpty() || descripcion.isEmpty()) {
-                Toast.makeText(context, "Por favor, completa todos los campos.", Toast.LENGTH_SHORT).show()
-                return@Button
-            }
-
-            // Guardar nota en Firestore
-            val notaData = hashMapOf(
-                "titulo" to titulo,
-                "descripcion" to descripcion,
-                "fecha" to fecha,
-                "userId" to auth.currentUser?.uid // Agregar el ID del usuario
-            )
-
-            firestore.collection("notas") // Nombre de la colección
-                .add(notaData)
-                .addOnSuccessListener { documentReference ->
-                    Toast.makeText(context, "Nota guardada con ID: ${documentReference.id}", Toast.LENGTH_SHORT).show()
-                    // Reiniciar los campos después de guardar
-                    titulo = ""
-                    descripcion = ""
-                    fecha = "Selecciona una fecha"
+        // Botón para guardar la nota
+        Button(
+            onClick = {
+                if (titulo.isNotBlank() && descripcion.isNotBlank() && fecha.isNotBlank() && userId != null) {
+                    loading = true
+                    val nuevaNota = mapOf(
+                        "titulo" to titulo,
+                        "descripcion" to descripcion,
+                        "fecha" to fecha,
+                        "userId" to userId,
+                        "categoriaId" to categoriaId // Guardar el ID de la categoría
+                    )
+                    firestore.collection("notas")
+                        .add(nuevaNota)
+                        .addOnSuccessListener {
+                            loading = false
+                            Toast.makeText(context, "Nota guardada", Toast.LENGTH_SHORT).show()
+                            onBackClick() // Volver atrás después de guardar
+                        }
+                        .addOnFailureListener { e ->
+                            loading = false
+                            Toast.makeText(context, "Error al guardar la nota: ${e.message}", Toast.LENGTH_SHORT).show()
+                        }
+                } else {
+                    Toast.makeText(context, "Por favor completa todos los campos.", Toast.LENGTH_SHORT).show()
                 }
-                .addOnFailureListener { e ->
-                    Toast.makeText(context, "Error al guardar nota: ${e.message}", Toast.LENGTH_SHORT).show()
-                }
-        }) {
-            Text(text = "Guardar Nota")
+            },
+            modifier = Modifier.fillMaxWidth(),
+            enabled = !loading // Deshabilitar el botón si está cargando
+        ) {
+            Text(text = if (loading) "Guardando..." else "Guardar Nota")
         }
     }
 }
-

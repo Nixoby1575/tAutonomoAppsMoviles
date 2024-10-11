@@ -1,18 +1,25 @@
 package com.example.taskiapp
-import androidx.compose.ui.Modifier
+
 import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.unit.dp
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.unit.dp
 
 class BienvenidoActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -25,7 +32,7 @@ class BienvenidoActivity : ComponentActivity() {
         setContent {
             BienvenidoScreen(userName = userName ?: "Usuario", onLogout = {
                 // Lógica para cerrar sesión
-                sharedPref.edit().clear().apply() // Limpiar todas las preferencias
+                sharedPref.edit().putBoolean("isLoggedIn", false).apply()
 
                 // Navegar a MainActivity
                 val intent = Intent(this, MainActivity::class.java)
@@ -40,53 +47,189 @@ class BienvenidoActivity : ComponentActivity() {
 fun BienvenidoScreen(userName: String, onLogout: () -> Unit) {
     val context = LocalContext.current
 
-    Column(
+    // Fondo de pantalla
+    Box(
         modifier = Modifier
             .fillMaxSize()
-            .padding(16.dp),
-        verticalArrangement = Arrangement.Top,
-        horizontalAlignment = Alignment.CenterHorizontally
+            .background(Color.White) // Color de fondo
     ) {
-        // Cuadro verde con mensaje de bienvenida
-        Box(
+        // Encabezado
+        Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .background(Color(0xFF4CAF50)) // Color verde
+                .padding(16.dp)
+                .background(MaterialTheme.colorScheme.primary) // Color del encabezado
                 .padding(16.dp)
         ) {
-            Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                Text(text = "BIENVENIDO", color = Color.White)
-                Text(text = userName, color = Color.White)
+            Text(
+                text = "Agenda Online",
+                style = MaterialTheme.typography.headlineLarge.copy(color = Color.White),
+                modifier = Modifier.padding(bottom = 8.dp)
+            )
+            Text(
+                text = "Bienvenido(a)",
+                style = MaterialTheme.typography.bodyMedium.copy(color = Color.White),
+                modifier = Modifier.padding(bottom = 4.dp)
+            )
+            Text(
+                text = userName,
+                style = MaterialTheme.typography.bodyLarge.copy(color = Color.White)
+            )
+        }
+
+        // Espaciado
+        Spacer(modifier = Modifier.height(32.dp))
+
+        // Cuadro de opciones
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp)
+                .align(Alignment.Center)
+        ) {
+            // Fila con dos columnas
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceEvenly // Distribuir espacio uniformemente
+            ) {
+                // Primera columna
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    modifier = Modifier.weight(1f) // Ocupa el mismo espacio que la segunda columna
+                ) {
+                    // Imagen para Agregar Nota
+                    Image(
+                        painter = painterResource(id = R.drawable.agregar_nota),
+                        contentDescription = "Agregar Nota",
+                        modifier = Modifier
+                            .size(80.dp) // Tamaño de la imagen
+                            .clickable {
+                                val intent = Intent(context, NotaActivity::class.java)
+                                context.startActivity(intent)
+                            },
+                        contentScale = ContentScale.Crop
+                    )
+                    Spacer(modifier = Modifier.height(8.dp))
+                    // Botón de Agregar Nota
+                    Button(
+                        onClick = {
+                            val intent = Intent(context, NotaActivity::class.java)
+                            context.startActivity(intent)
+                        },
+                        colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.secondary),
+                        modifier = Modifier.fillMaxWidth(0.8f)
+                    ) {
+                        Text(text = "Agregar Nota", color = Color.White)
+                    }
+
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    // Imagen para Mis Notas
+                    Image(
+                        painter = painterResource(id = R.drawable.mis_notas),
+                        contentDescription = "Mis Notas",
+                        modifier = Modifier
+                            .size(80.dp) // Tamaño de la imagen
+                            .clickable {
+                                val intent = Intent(context, MisNotasActivity::class.java)
+                                context.startActivity(intent)
+                            },
+                        contentScale = ContentScale.Crop
+                    )
+                    Spacer(modifier = Modifier.height(8.dp))
+                    // Botón de Mis Notas
+                    Button(
+                        onClick = {
+                            val intent = Intent(context, MisNotasActivity::class.java)
+                            context.startActivity(intent)
+                        },
+                        colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.secondary),
+                        modifier = Modifier.fillMaxWidth(0.8f)
+                    ) {
+                        Text(text = "Mis Notas", color = Color.White)
+                    }
+                }
+
+                // Segunda columna
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    modifier = Modifier.weight(1f) // Ocupa el mismo espacio que la primera columna
+                ) {
+                    // Imagen para Crear Categoría
+                    Image(
+                        painter = painterResource(id = R.drawable.crear_categoria),
+                        contentDescription = "Crear Categoría",
+                        modifier = Modifier
+                            .size(80.dp) // Tamaño de la imagen
+                            .clickable {
+                                val intent = Intent(context, AgregarCategoriaActivity::class.java)
+                                context.startActivity(intent)
+                            },
+                        contentScale = ContentScale.Crop
+                    )
+                    Spacer(modifier = Modifier.height(8.dp))
+                    // Botón de Crear Categoría
+                    Button(
+                        onClick = {
+                            val intent = Intent(context, AgregarCategoriaActivity::class.java)
+                            context.startActivity(intent)
+                        },
+                        colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.secondary),
+                        modifier = Modifier.fillMaxWidth(0.8f)
+                    ) {
+                        Text(text = "Crear Categoría", color = Color.White)
+                    }
+
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    // Imagen para Ver Categorías
+                    Image(
+                        painter = painterResource(id = R.drawable.ver_categoria),
+                        contentDescription = "Ver Categorías",
+                        modifier = Modifier
+                            .size(80.dp) // Tamaño de la imagen
+                            .clickable {
+                                val intent = Intent(context, CategoriasActivity::class.java)
+                                context.startActivity(intent)
+                            },
+                        contentScale = ContentScale.Crop
+                    )
+                    Spacer(modifier = Modifier.height(8.dp))
+                    // Botón de Ver Categorías
+                    Button(
+                        onClick = {
+                            val intent = Intent(context, CategoriasActivity::class.java)
+                            context.startActivity(intent)
+                        },
+                        colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.secondary),
+                        modifier = Modifier.fillMaxWidth(0.8f)
+                    ) {
+                        Text(text = "Ver Categorías", color = Color.White)
+                    }
+                }
+            }
+
+            // Espaciado adicional si es necesario
+            Spacer(modifier = Modifier.height(16.dp))
+
+            // Imagen para Cerrar Sesión
+            Image(
+                painter = painterResource(id = R.drawable.cerrar_sesion),
+                contentDescription = "Cerrar Sesión",
+                modifier = Modifier
+                    .size(80.dp) // Tamaño de la imagen
+                    .clickable { onLogout() }, // Asegúrate de invocar la función aquí
+                contentScale = ContentScale.Crop
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+            // Botón de Cerrar Sesión
+            Button(
+                onClick = onLogout,
+                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.secondary),
+                modifier = Modifier.fillMaxWidth(0.8f)
+            ) {
+                Text(text = "Cerrar Sesión", color = Color.White)
             }
         }
-
-        Spacer(modifier = Modifier.height(24.dp))
-
-        // Botón de cerrar sesión
-        Button(onClick = onLogout) {
-            Text(text = "Cerrar sesión")
-        }
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        // Botón para ir a la actividad de agregar nota
-        Button(onClick = {
-            val intent = Intent(context, NotaActivity::class.java)
-            context.startActivity(intent)
-        }) {
-            Text(text = "Agregar Nota")
-        }
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        // Botón para ir a la actividad de mis notas
-        Button(onClick = {
-            val intent = Intent(context, MisNotasActivity::class.java)
-            context.startActivity(intent)
-        }) {
-            Text(text = "Mis Notas")
-        }
-
-        // Puedes agregar más botones para "Archivados", "Perfil", "Acerca de", etc.
     }
 }
