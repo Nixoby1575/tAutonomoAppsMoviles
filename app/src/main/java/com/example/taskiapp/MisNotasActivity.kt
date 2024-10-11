@@ -22,7 +22,7 @@ import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.platform.LocalContext
-
+import com.example.taskiapp.data.Nota
 class MisNotasActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -261,10 +261,3 @@ fun EditarNotaDialog(nota: Nota, onSave: (String, String) -> Unit, onCancel: () 
     )
 }
 
-// Data class para representar las notas
-data class Nota(
-    val id: String,
-    val titulo: String,
-    val descripcion: String,
-    val fecha: String
-)

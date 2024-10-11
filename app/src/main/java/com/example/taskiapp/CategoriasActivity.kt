@@ -1,5 +1,5 @@
 package com.example.taskiapp
-
+import com.example.taskiapp.data.Categoria
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
@@ -20,8 +20,10 @@ import com.google.firebase.firestore.FirebaseFirestore
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.Modifier
+
 fun intToColor(colorInt: Int): Color {
     return Color(colorInt)
 }
@@ -37,7 +39,8 @@ class CategoriasActivity : ComponentActivity() {
                 onAddCategoria = { abrirAgregarCategoria() },
                 onEditCategoria = { categoria -> editarCategoria(categoria) },
                 onDeleteCategoria = { categoria -> borrarCategoria(categoria) },
-                onViewNotas = { categoria -> verNotas(categoria) } // Nueva función para ver notas
+                onViewNotas = { categoria -> verNotas(categoria) }, // Nueva función para ver notas
+                onBackClick = { finish() } // Pasar la función para volver atrás
             )
         }
     }
@@ -79,7 +82,8 @@ fun CategoriasScreen(
     onAddCategoria: () -> Unit,
     onEditCategoria: (Categoria) -> Unit,
     onDeleteCategoria: (Categoria) -> Unit,
-    onViewNotas: (Categoria) -> Unit // Agregar el callback para ver notas
+    onViewNotas: (Categoria) -> Unit,
+    onBackClick: () -> Unit // Recibir la función para volver atrás
 ) {
     val categorias = remember { mutableStateListOf<Categoria>() }
     val firestore = FirebaseFirestore.getInstance()
@@ -117,31 +121,75 @@ fun CategoriasScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(16.dp)
-            .background(MaterialTheme.colorScheme.background),
-        verticalArrangement = Arrangement.Top,
-        horizontalAlignment = Alignment.Start
+            .background(MaterialTheme.colorScheme.background)
     ) {
-        Text(text = "Categorías", style = MaterialTheme.typography.headlineMedium)
+        // Encabezado con el color del encabezado de la pantalla de bienvenida
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(MaterialTheme.colorScheme.primary) // Color del encabezado
+                .padding(16.dp)
+        ) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.Start
+            ) {
+                // Botón de regresar
+                IconButton(onClick = onBackClick) {
+                    Icon(
+                        imageVector = Icons.Default.ArrowBack,
+                        contentDescription = "Regresar",
+                        tint = Color.White
+                    )
+                }
 
-        Spacer(modifier = Modifier.height(24.dp))
+                Spacer(modifier = Modifier.width(16.dp))
 
-        // Lista de categorías
-        for (categoria in categorias) {
-            CategoriaItem(categoria = categoria, onEdit = onEditCategoria, onDelete = onDeleteCategoria, onViewNotas = onViewNotas)
-            Spacer(modifier = Modifier.height(8.dp))
+                // Texto de "Categorías"
+                Text(
+                    text = "Categorías",
+                    color = Color.White,
+                    style = MaterialTheme.typography.headlineSmall
+                )
+            }
         }
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        Button(onClick = onAddCategoria) {
-            Text("Agregar Categoría")
+        // Lista de categorías
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(16.dp),
+            verticalArrangement = Arrangement.Top,
+            horizontalAlignment = Alignment.Start
+        ) {
+            for (categoria in categorias) {
+                CategoriaItem(
+                    categoria = categoria,
+                    onEdit = onEditCategoria,
+                    onDelete = onDeleteCategoria,
+                    onViewNotas = onViewNotas
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            Button(onClick = onAddCategoria) {
+                Text("Agregar Categoría")
+            }
         }
     }
 }
 
 @Composable
-fun CategoriaItem(categoria: Categoria, onEdit: (Categoria) -> Unit, onDelete: (Categoria) -> Unit, onViewNotas: (Categoria) -> Unit) {
+fun CategoriaItem(
+    categoria: Categoria,
+    onEdit: (Categoria) -> Unit,
+    onDelete: (Categoria) -> Unit,
+    onViewNotas: (Categoria) -> Unit
+) {
     // Contenedor con un fondo del color asignado a la categoría y sombra
     Surface(
         modifier = Modifier
@@ -159,8 +207,6 @@ fun CategoriaItem(categoria: Categoria, onEdit: (Categoria) -> Unit, onDelete: (
         ) {
             Text(text = "Nombre: ${categoria.nombre.ifEmpty { "Sin Nombre" }}", style = MaterialTheme.typography.titleMedium)
 
-            // Mostrar el valor del color como texto
-            Text(text = "Color: ${categoria.color}", style = MaterialTheme.typography.bodyMedium)
 
             Spacer(modifier = Modifier.height(8.dp))
 
@@ -185,8 +231,3 @@ fun CategoriaItem(categoria: Categoria, onEdit: (Categoria) -> Unit, onDelete: (
     }
 }
 
-data class Categoria(
-    var id: String = "",
-    var nombre: String = "",
-    var color: Int = 0 // Cambiado a Int
-)

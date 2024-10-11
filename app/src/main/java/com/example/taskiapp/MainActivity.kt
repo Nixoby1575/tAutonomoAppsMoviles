@@ -61,7 +61,7 @@ class MainActivity : ComponentActivity() {
             Spacer(modifier = Modifier.height(24.dp))
 
             Text(
-                text = "Bienvenido a tu Agenda Online",
+                text = "Bienvenido a Taskify",
                 style = MaterialTheme.typography.headlineLarge,
                 color = Color(0xFF100E0E) // Cambia a un color que te guste
             )
