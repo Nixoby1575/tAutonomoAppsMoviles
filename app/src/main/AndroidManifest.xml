@@ -72,6 +72,11 @@
             android:exported="true"
             android:label="Notas por Categoría" />
 
+        <activity
+            android:name=".ConfiguracionActivity"
+            android:exported="true"
+            android:label="Configuracion" />
+
     </application>
 
     <uses-permission android:name="android.permission.INTERNET" />

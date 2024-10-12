@@ -209,26 +209,74 @@ fun BienvenidoScreen(userName: String, onLogout: () -> Unit) {
                 }
             }
 
-            // Espaciado adicional si es necesario
             Spacer(modifier = Modifier.height(16.dp))
 
-            // Imagen para Cerrar Sesión
-            Image(
-                painter = painterResource(id = R.drawable.cerrar_sesion),
-                contentDescription = "Cerrar Sesión",
-                modifier = Modifier
-                    .size(80.dp) // Tamaño de la imagen
-                    .clickable { onLogout() }, // Asegúrate de invocar la función aquí
-                contentScale = ContentScale.Crop
-            )
-            Spacer(modifier = Modifier.height(8.dp))
-            // Botón de Cerrar Sesión
-            Button(
-                onClick = onLogout,
-                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.secondary),
-                modifier = Modifier.fillMaxWidth(0.8f)
+            // Fila para la opción de configuración y cerrar sesión
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceEvenly // Distribuir espacio uniformemente
             ) {
-                Text(text = "Cerrar Sesión", color = Color.White)
+                // Imagen para Configuración
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    modifier = Modifier.weight(1f)
+                ) {
+                    Image(
+                        painter = painterResource(id = R.drawable.configuracion),
+                        contentDescription = "Configuración",
+                        modifier = Modifier
+                            .size(80.dp) // Tamaño de la imagen
+                            .clickable {
+                                val intent = Intent(context, ConfiguracionActivity::class.java)
+                                context.startActivity(intent)
+                            },
+                        contentScale = ContentScale.Crop
+                    )
+                    Spacer(modifier = Modifier.height(8.dp))
+                    // Botón de Configuración
+                    Button(
+                        onClick = {
+                            val intent = Intent(context, ConfiguracionActivity::class.java)
+                            context.startActivity(intent)
+                        },
+                        colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.secondary),
+                        modifier = Modifier.fillMaxWidth() // Usar todo el ancho disponible
+                    ) {
+                        Text(
+                            text = "Configuración",
+                            color = Color.White,
+                            modifier = Modifier.padding(vertical = 8.dp) // Ajustar el padding
+                        )
+                    }
+                }
+
+                // Imagen para Cerrar Sesión
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    modifier = Modifier.weight(1f)
+                ) {
+                    Image(
+                        painter = painterResource(id = R.drawable.cerrar_sesion),
+                        contentDescription = "Cerrar Sesión",
+                        modifier = Modifier
+                            .size(80.dp) // Tamaño de la imagen
+                            .clickable { onLogout() }, // Asegúrate de invocar la función aquí
+                        contentScale = ContentScale.Crop
+                    )
+                    Spacer(modifier = Modifier.height(8.dp))
+                    // Botón de Cerrar Sesión
+                    Button(
+                        onClick = onLogout,
+                        colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.secondary),
+                        modifier = Modifier.fillMaxWidth() // Usar todo el ancho disponible
+                    ) {
+                        Text(
+                            text = "Cerrar Sesión",
+                            color = Color.White,
+                            modifier = Modifier.padding(vertical = 8.dp) // Ajustar el padding
+                        )
+                    }
+                }
             }
         }
     }
