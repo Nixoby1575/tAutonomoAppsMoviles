@@ -14,7 +14,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.draw.shadow
 import com.google.firebase.firestore.FirebaseFirestore
@@ -22,17 +21,15 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
+import androidx.compose.ui.platform.LocalContext
 
 class AgregarCategoriaActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            AgregarCategoriaScreen(
-                onBackClick = { finish() },
-                onAgregar = { nombre, color ->
-                    agregarCategoria(nombre, color)
-                }
-            )
+            AgregarCategoriaScreen(onBackClick = { finish() }) { nombre, color ->
+                agregarCategoria(nombre, color)
+            }
         }
     }
 
@@ -60,8 +57,11 @@ class AgregarCategoriaActivity : ComponentActivity() {
 @Composable
 fun AgregarCategoriaScreen(onBackClick: () -> Unit, onAgregar: (String, Color) -> Unit) {
     var nombreCategoria by remember { mutableStateOf("") }
-    var colorCategoria by remember { mutableStateOf<Color?>(null) }
-    var isColorPickerExpanded by remember { mutableStateOf(false) }
+    var colorCategoria by remember { mutableStateOf<Color?>(null) } // Cambiado a nullable para verificar si hay color seleccionado
+    var isColorPickerExpanded by remember { mutableStateOf(false) } // Controla si el selector de color está desplegado o no
+    val context = LocalContext.current
+
+    // Verificar si ambos campos están completos para habilitar el botón
     val isFormValid = nombreCategoria.isNotBlank() && colorCategoria != null
 
     Column(
@@ -72,10 +72,11 @@ fun AgregarCategoriaScreen(onBackClick: () -> Unit, onAgregar: (String, Color) -
         verticalArrangement = Arrangement.Top,
         horizontalAlignment = Alignment.Start
     ) {
+        // Encabezado con el color y botón de regresar
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .background(MaterialTheme.colorScheme.primary)
+                .background(MaterialTheme.colorScheme.primary) // Color del encabezado
                 .padding(16.dp)
         ) {
             Row(
@@ -89,7 +90,9 @@ fun AgregarCategoriaScreen(onBackClick: () -> Unit, onAgregar: (String, Color) -
                         tint = Color.White
                     )
                 }
+
                 Spacer(modifier = Modifier.width(16.dp))
+
                 Text(
                     text = "Crear una categoría",
                     color = Color.White,
@@ -100,6 +103,7 @@ fun AgregarCategoriaScreen(onBackClick: () -> Unit, onAgregar: (String, Color) -
 
         Spacer(modifier = Modifier.height(16.dp))
 
+        // Campo de texto para el nombre de la categoría
         OutlinedTextField(
             value = nombreCategoria,
             onValueChange = { nombreCategoria = it },
@@ -109,11 +113,12 @@ fun AgregarCategoriaScreen(onBackClick: () -> Unit, onAgregar: (String, Color) -
 
         Spacer(modifier = Modifier.height(16.dp))
 
+        // Área de selección de color con texto y flecha
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .shadow(4.dp, RoundedCornerShape(8.dp))
-                .clickable { isColorPickerExpanded = !isColorPickerExpanded }
+                .shadow(4.dp, RoundedCornerShape(8.dp)) // Sombra alrededor del contenedor
+                .clickable { isColorPickerExpanded = !isColorPickerExpanded } // Al hacer clic, alterna el estado del selector
                 .background(MaterialTheme.colorScheme.surface)
                 .padding(16.dp)
         ) {
@@ -126,6 +131,8 @@ fun AgregarCategoriaScreen(onBackClick: () -> Unit, onAgregar: (String, Color) -
                     text = "Elige el color de tu categoría",
                     style = MaterialTheme.typography.bodyMedium
                 )
+
+                // Mostrar flecha según el estado del ColorPicker
                 Icon(
                     imageVector = if (isColorPickerExpanded) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown,
                     contentDescription = null,
@@ -136,21 +143,25 @@ fun AgregarCategoriaScreen(onBackClick: () -> Unit, onAgregar: (String, Color) -
 
         Spacer(modifier = Modifier.height(8.dp))
 
+        // Mostrar el selector de colores si está expandido
         if (isColorPickerExpanded) {
             ColorPicker { selectedColor ->
                 colorCategoria = selectedColor
-                isColorPickerExpanded = false
+                isColorPickerExpanded = false // Colapsa el selector de color al seleccionar uno
             }
         }
 
         Spacer(modifier = Modifier.height(16.dp))
 
+        // Botón para crear la categoría
         Button(
-            onClick = { onAgregar(nombreCategoria, colorCategoria ?: Color.Gray) },
-            enabled = isFormValid,
+            onClick = {
+                onAgregar(nombreCategoria, colorCategoria ?: Color.Gray) // Llamar a la función de agregar
+            },
+            enabled = isFormValid, // Solo habilitar cuando el formulario sea válido
             colors = ButtonDefaults.buttonColors(
-                disabledContainerColor = Color.Gray,
-                containerColor = MaterialTheme.colorScheme.primary
+                disabledContainerColor = Color.Gray, // Color cuando está deshabilitado
+                containerColor = MaterialTheme.colorScheme.primary // Color normal
             ),
             modifier = Modifier.fillMaxWidth()
         ) {
@@ -162,10 +173,10 @@ fun AgregarCategoriaScreen(onBackClick: () -> Unit, onAgregar: (String, Color) -
 @Composable
 fun ColorPicker(onColorSelected: (Color) -> Unit) {
     Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly) {
-        ColorSwatch(Color.Red, onColorSelected)
-        ColorSwatch(Color.Green, onColorSelected)
-        ColorSwatch(Color.Blue, onColorSelected)
-        ColorSwatch(Color.Yellow, onColorSelected)
+        ColorSwatch(Color.Red) { onColorSelected(it) }
+        ColorSwatch(Color.Green) { onColorSelected(it) }
+        ColorSwatch(Color.Blue) { onColorSelected(it) }
+        ColorSwatch(Color.Yellow) { onColorSelected(it) }
     }
 }
 
