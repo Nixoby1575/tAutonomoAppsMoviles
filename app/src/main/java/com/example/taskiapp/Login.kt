@@ -1,9 +1,7 @@
 package com.example.taskiapp
-
-import android.content.Context
+import android.content.Context // Agrega esta línea
 import android.content.Intent
 import android.os.Bundle
-import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.*
@@ -15,8 +13,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import android.widget.Toast
 import com.example.taskiapp.ui.theme.TASKIAPPTheme
 import com.google.firebase.auth.FirebaseAuth
+
+import android.content.SharedPreferences
 
 class Login : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
