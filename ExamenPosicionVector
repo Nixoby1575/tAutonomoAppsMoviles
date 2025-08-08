@@ -1,0 +1,23 @@
+def buscar_numero(vector, x):
+    for i in range(len(vector)):
+        if vector[i] == x:
+            return i
+    return -1
+
+# Prueba de ejecución
+n = int(input("¿Cuántos elementos tendrá el vector? "))
+vector = []
+
+print("Ingrese los elementos del vector:")
+for i in range(n):
+    elemento = int(input(f"Elemento {i+1}: "))
+    vector.append(elemento)
+
+x = int(input("Ingrese el número a buscar: "))
+
+pos = buscar_numero(vector, x)
+
+if pos == -1:
+    print("Número no encontrado.")
+else:
+    print(f"El número se encuentra en la posición {pos}")
